@@ -1,0 +1,40 @@
+{
+  "name": "dnd-ferreteria",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.15.1",
+  "description": "DND Ferretería — Business Management PWA",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:api": "pnpm --filter @dnd/api dev",
+    "dev:web": "pnpm --filter @dnd/web dev",
+    "build": "pnpm --filter @dnd/shared build && pnpm --filter @dnd/api build && pnpm --filter @dnd/web build",
+    "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter @dnd/web test:e2e",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\"",
+    "db:generate": "pnpm --filter @dnd/api db:generate",
+    "db:migrate": "pnpm --filter @dnd/api db:migrate",
+    "db:push": "pnpm --filter @dnd/api db:push",
+    "db:seed": "pnpm --filter @dnd/api db:seed"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "eslint": "^9.9.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.2.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "msw",
+      "prisma"
+    ]
+  }
+}
