@@ -1,0 +1,293 @@
+<!-- Catálogo Virtual -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Virtual Catalog - BizOps Manager</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#9d4300",
+                        "primary-fixed": "#ffdbca",
+                        "error": "#ffb4ab",
+                        "secondary-container": "#474746",
+                        "on-tertiary": "#313030",
+                        "surface-tint": "#ffb690",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed": "#1b1b1c",
+                        "surface-variant": "#333535",
+                        "surface": "#121414",
+                        "surface-container-low": "#1a1c1c",
+                        "tertiary-fixed": "#e5e2e1",
+                        "on-primary-fixed-variant": "#783200",
+                        "on-secondary-container": "#b7b5b4",
+                        "on-background": "#e2e2e2",
+                        "primary-fixed-dim": "#ffb690",
+                        "on-surface-variant": "#e0c0b1",
+                        "tertiary": "#c8c6c5",
+                        "surface-dim": "#121414",
+                        "on-surface": "#e2e2e2",
+                        "surface-bright": "#37393a",
+                        "on-secondary-fixed-variant": "#474746",
+                        "on-primary": "#552100",
+                        "surface-container-high": "#282a2b",
+                        "on-tertiary-container": "#333232",
+                        "on-primary-fixed": "#341100",
+                        "tertiary-container": "#9c9a9a",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "primary-container": "#f97316",
+                        "on-error": "#690005",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "surface-container-lowest": "#0c0f0f",
+                        "surface-container-highest": "#333535",
+                        "on-secondary": "#303030",
+                        "inverse-surface": "#e2e2e2",
+                        "primary": "#ffb690",
+                        "secondary": "#c8c6c5",
+                        "surface-container": "#1e2020",
+                        "secondary-fixed": "#e5e2e1",
+                        "outline": "#a78b7d",
+                        "background": "#121414",
+                        "outline-variant": "#584237",
+                        "inverse-on-surface": "#2f3131",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#582200"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "touch-target": "48px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "gutter": "16px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "title-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen bg-background">
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex bg-surface-container text-primary font-label-caps text-label-caps h-screen w-64 flex-col border-r border-outline-variant fixed left-0 top-0 py-margin-desktop z-40">
+<div class="px-6 mb-8 flex flex-col gap-2">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center overflow-hidden border border-outline">
+<span class="material-symbols-outlined text-primary text-2xl">storefront</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary mt-4">Global Retail</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Admin Terminal</p>
+</div>
+<div class="flex-1 overflow-y-auto hide-scrollbar px-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 h-touch-target rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 h-touch-target rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined">point_of_sale</span> POS System
+            </a>
+<a class="flex items-center gap-3 px-4 h-touch-target rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span> Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 h-touch-target rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined">payments</span> Expenses
+            </a>
+<a class="flex items-center gap-3 px-4 h-touch-target rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined">group</span> Clients
+            </a>
+<a class="flex items-center gap-3 px-4 h-touch-target rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined">conveyor_belt</span> Suppliers
+            </a>
+<a class="flex items-center gap-3 px-4 h-touch-target rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined">badge</span> Employees
+            </a>
+<a class="flex items-center gap-3 px-4 h-touch-target rounded text-primary border-r-4 border-primary bg-surface-container-highest cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined">menu_book</span> Catalog
+            </a>
+</div>
+<div class="mt-auto px-4 pt-4 border-t border-outline-variant flex flex-col gap-2">
+<button class="w-full h-touch-target bg-surface-variant text-on-surface hover:bg-surface-container-high transition-colors rounded flex items-center justify-center gap-2 border border-outline">
+<span class="material-symbols-outlined text-error">warning</span>
+<span class="font-label-caps text-label-caps">Quick Inventory Alert</span>
+</button>
+<div class="flex flex-col gap-1 mt-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">support_agent</span> Support
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">logout</span> Logout
+                </a>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col md:ml-64 min-w-0">
+<!-- TopNavBar -->
+<header class="bg-surface text-primary font-title-md text-title-md w-full h-touch-target border-b border-outline-variant flex justify-between items-center px-margin-desktop sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="md:hidden">
+<span class="material-symbols-outlined text-2xl cursor-pointer">menu</span>
+</div>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary md:hidden">BizOps Manager</span>
+<span class="hidden md:inline font-bold">Catalog Portal</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="h-10 pl-10 pr-4 bg-surface-container-low border border-outline-variant rounded text-on-surface font-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-64" placeholder="Search catalog..." type="text"/>
+</div>
+<button class="hidden sm:flex items-center justify-center h-10 px-4 bg-primary text-on-primary font-label-caps text-label-caps rounded hover:bg-primary-fixed transition-colors">
+                    New Sale
+                </button>
+<button class="hidden sm:flex items-center justify-center h-10 px-4 bg-transparent border border-outline text-on-surface font-label-caps text-label-caps rounded hover:bg-surface-container-high transition-colors">
+                    Notifications
+                </button>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline ml-2">
+<img alt="User avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a business manager in a dark studio setting. The lighting is dramatic and cinematic, highlighting the subject's face against a deep black background. The overall tone is serious, modern, and corporate, fitting an administrative dashboard context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC0la6lbspjFDSGWLK15GlgXEn-Ae-s9JfF93MMPo6HK9lroOhnoWMtiqe1eLgIVgMsggtuabcCUDllSI_wJi0C6l6XOLo7uWY4BXEFpVxzz8h6v74BDoGKXxB8Fc7rs1reuTTrkMhHWW9e2gh0h1Xg6KNz3wpPcx3_07vPSXrPcx2gubS_L7jhVkC0C2tljNcfXn0eV_pM63pCIih1TaxrSPN7s09RLMwlurafG1uMXBk5I1rvYIN"/>
+</div>
+</div>
+</header>
+<!-- Catalog Content -->
+<div class="flex-1 p-margin-mobile md:p-margin-desktop overflow-y-auto">
+<!-- Filters & Search (Mobile/Tablet prominent) -->
+<div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Product Catalog</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Browse and share inventory items directly with clients.</p>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-full border border-primary text-primary font-label-caps text-label-caps bg-primary/10">All Items</button>
+<button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high transition-colors">Electronics</button>
+<button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high transition-colors">Apparel</button>
+<button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high transition-colors">Accessories</button>
+</div>
+</div>
+<!-- Grid Layout -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Product Card 1 -->
+<div class="bg-surface-container rounded-lg border border-outline-variant overflow-hidden flex flex-col group hover:border-primary transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-low relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A high-end, sleek black professional drone with a 4K camera attached, hovering slightly above a dark reflective surface. The lighting is dramatic, with subtle neon orange edge highlights creating a tech-forward, premium aesthetic suitable for a high-stakes retail catalog." src="https://lh3.googleusercontent.com/aida-public/AB6AXuARbOgvaYo6lFQL_EVY3mlkY6UXmreClIZL1PdM88S-di0Ozu51SWDYMotuGtxGVd8CDnPWva-rStiYvm3cRsjE_0wZydx687Pt5FTjslgJWKuDKtMbwNoKshnQyKOYZ15XGCkQDbKxXguLYMnYaE2luTsXvhFviFSIllvTSjNb5UTZ6KGxadqITfgT-MI3dzUkLs3rrUsy8eTqLHvjSpJzfegfLFFrAOIO5_TNI-wgXiXLAnFAD0dl"/>
+<div class="absolute top-2 left-2 bg-surface-variant/80 backdrop-blur px-2 py-1 rounded text-on-surface font-label-caps text-label-caps border border-outline">
+                            SKU: DR-492
+                        </div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-on-surface leading-tight">AeroPro Drone V2</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-4">Professional grade quadcopter with 4K camera and obstacle avoidance.</p>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-data-mono text-data-mono text-primary text-lg">$1,299.00</span>
+<button class="bg-primary text-on-primary w-10 h-10 rounded flex items-center justify-center hover:bg-primary-fixed transition-colors shadow-lg" title="Share on WhatsApp">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface-container rounded-lg border border-outline-variant overflow-hidden flex flex-col group hover:border-primary transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-low relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A pair of premium noise-canceling over-ear headphones in matte black, resting on a dark, textured slate surface. Strategic low-key lighting emphasizes the sleek metallic accents and plush ear cushions, giving it an ultra-modern, sophisticated look for a dark-mode e-commerce site." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkHMUMlLS50QP2CSZodLJqR2nl6RlCjPpTl-vCRxnzazsPoF7QlV56dyFx4NXX78rUI0lOkUGyCDIzRi6FT08f61LrEVwr-SDx-yeuKR0TwsSlzzjTn1wwHPRgfZ72CeFExj6nvh_swEKoD1KjWG47F3sorDx4mRWyq5NZxCUQjPNAONPZFyZwdBk38euPewAK1idgbn_IQlOdUd3Wz1AKRwA9DdgfSfitVzk6qDDQ_SDaaWArhO3o"/>
+<div class="absolute top-2 right-2 bg-error/20 px-2 py-1 rounded text-error font-label-caps text-label-caps border border-error/50">
+                            Low Stock
+                        </div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-on-surface leading-tight">SonicX ANC Headphones</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-4">Industry-leading noise cancellation with 30-hour battery life.</p>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-data-mono text-data-mono text-primary text-lg">$349.00</span>
+<button class="bg-primary text-on-primary w-10 h-10 rounded flex items-center justify-center hover:bg-primary-fixed transition-colors shadow-lg" title="Share on WhatsApp">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-surface-container rounded-lg border border-outline-variant overflow-hidden flex flex-col group hover:border-primary transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-low relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A minimalist, high-performance smartwatch with a dark titanium case and a black fluoroelastomer band. The watch face displays glowing orange digital metrics against a pitch-black screen. It is positioned on a dark acrylic pedestal, reflecting the modern corporate, high-contrast aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuADtsw10vkHIsOCSyCsmQfRI1-6DUpLtFB3g7e3h14qzzJOjgzpBvT5dQlDtIaEZ8VyGTrncqdDii6EYFt-27TQ1ZdPtCAL6CB7fNjtdKKYb-myOFRRIb8YneIU3RfsPAK8zlFDHxgBfblg2oaKcHNObvuVsH_ivihnrYA0eEkkHVBg56wvq_-UJbT0xzHXJqun-qv91RE-qmcyBM1EkBXeFzomkTEjBQNWBvsh6NC6bYL5Sl2Qxu3z"/>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-on-surface leading-tight">Titanium Smartwatch</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-4">Rugged outdoor smartwatch with GPS, heart rate monitor, and solar charging.</p>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-data-mono text-data-mono text-primary text-lg">$899.00</span>
+<button class="bg-primary text-on-primary w-10 h-10 rounded flex items-center justify-center hover:bg-primary-fixed transition-colors shadow-lg" title="Share on WhatsApp">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="bg-surface-container rounded-lg border border-outline-variant overflow-hidden flex flex-col group hover:border-primary transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-low relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A sleek, ultra-thin laptop slightly opened, revealing a vibrant edge-to-edge display against a completely dark background. The keyboard is backlit with a subtle white glow. The laptop chassis is dark grey aluminum, photographed with sharp, precise lighting to highlight its premium build quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxYRTZ0SHa5fGVJ0VLjDZfdbN4xWcJpMMaxW0Mw4VSdog4dML8TQcyToHveeECQZ7sujOin9U516NC9QQQTTOE2k_07Dtsh7SwuY9zmhfgFKyXRxkVCnB6_Ley1L5jVS6kdGwh7c5Kvga10dNxeRJO_fI63J7Khz94OWRsACf5-TGEQPSIeSq6QT-Fmmw4uaORd064nK5dSpj2qCjRgWshZOXPBtiihJQwNw944IdsdnufAzJNF7Z_"/>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-on-surface leading-tight">ProBook Ultra 14"</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-4">Lightweight powerhouse for professionals. M2 chip, 16GB RAM, 512GB SSD.</p>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-data-mono text-data-mono text-primary text-lg">$1,499.00</span>
+<button class="bg-primary text-on-primary w-10 h-10 rounded flex items-center justify-center hover:bg-primary-fixed transition-colors shadow-lg" title="Share on WhatsApp">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">share</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

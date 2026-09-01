@@ -1,0 +1,424 @@
+<!-- Gestión de Empleados -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Employee Management - BizOps Manager</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#9d4300",
+                        "primary-fixed": "#ffdbca",
+                        "error": "#ffb4ab",
+                        "secondary-container": "#474746",
+                        "on-tertiary": "#313030",
+                        "surface-tint": "#ffb690",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed": "#1b1b1c",
+                        "surface-variant": "#333535",
+                        "surface": "#121414",
+                        "surface-container-low": "#1a1c1c",
+                        "tertiary-fixed": "#e5e2e1",
+                        "on-primary-fixed-variant": "#783200",
+                        "on-secondary-container": "#b7b5b4",
+                        "on-background": "#e2e2e2",
+                        "primary-fixed-dim": "#ffb690",
+                        "on-surface-variant": "#e0c0b1",
+                        "tertiary": "#c8c6c5",
+                        "surface-dim": "#121414",
+                        "on-surface": "#e2e2e2",
+                        "surface-bright": "#37393a",
+                        "on-secondary-fixed-variant": "#474746",
+                        "on-primary": "#552100",
+                        "surface-container-high": "#282a2b",
+                        "on-tertiary-container": "#333232",
+                        "on-primary-fixed": "#341100",
+                        "tertiary-container": "#9c9a9a",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "primary-container": "#f97316",
+                        "on-error": "#690005",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "surface-container-lowest": "#0c0f0f",
+                        "surface-container-highest": "#333535",
+                        "on-secondary": "#303030",
+                        "inverse-surface": "#e2e2e2",
+                        "primary": "#ffb690",
+                        "secondary": "#c8c6c5",
+                        "surface-container": "#1e2020",
+                        "secondary-fixed": "#e5e2e1",
+                        "outline": "#a78b7d",
+                        "background": "#121414",
+                        "outline-variant": "#584237",
+                        "inverse-on-surface": "#2f3131",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#582200"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "touch-target": "48px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "gutter": "16px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "title-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121414;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333535;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #474746;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-sm min-h-screen flex flex-col md:flex-row overflow-hidden">
+<!-- TopNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline-variant w-full sticky top-0 z-50 flex justify-between items-center px-margin-mobile h-touch-target">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-primary cursor-pointer active:opacity-80">menu</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary">BizOps Manager</span>
+</div>
+<div class="flex items-center gap-unit">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer active:opacity-80 p-2">search</span>
+<img class="w-8 h-8 rounded-full border border-outline-variant object-cover ml-2" data-alt="A small circular avatar of a professional business manager in a dark corporate setting with high contrast lighting, representing the user profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEX4rTvMl2atzYxiFEKC5NOjUK2sO5wZYKe0bJTHg9-JcdJQNcnHrIDUCZNG5uZPUApupoyVpGY5Fr0uSKfFS_DxBkWySCiUXDbW-YYoBEv15-FGntMQIZUm_G8uC_4M2QpXfkSiqDwZbYTJHksaE5tHTYJs8uvofKb84WEbbvIns0sM9a6Zom9ZpZpXu8k12OlXw4Od2lgX9vtWs_6orUNwJEgtQKu4eLiNx9Ef-8SPdb4pNFxHz4"/>
+</div>
+</nav>
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden md:flex fixed left-0 top-0 h-full flex-col py-margin-desktop bg-surface-container dark:bg-surface-container border-r border-outline-variant dark:border-outline-variant h-screen w-64 z-40">
+<div class="px-margin-desktop mb-8 flex items-center gap-gutter">
+<img class="w-10 h-10 rounded object-cover border border-outline-variant" data-alt="A modern minimalist business logo for Global Retail, featuring sharp geometric shapes in high-contrast orange and black, suitable for a dark mode interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC302NYlS7qM5YADw0m79W695wxo66TYT61Q96KyT2jtBOB7tcPGtCQur3zPKWo_dOs9OIUIQNCE9k6t46qum5fbseJtvPeWscriha5lmRDvajdx4htDQA7xCW-B5aW8Gnh8jwNy1b2VuR4CpxTj0xBRkadvgIHXQI8W6Pv6WYT_229_f-se1cRghUAi7Lku1pcZuq98u75cbr6OdgqlDuItI8Z3iPvtRpBlZYsYKE0RptuzZdMGu0H"/>
+<div>
+<h1 class="font-headline-lg text-title-md text-primary dark:text-primary font-bold">Global Retail</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Admin Terminal</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto w-full px-4 flex flex-col gap-unit">
+<a class="flex items-center gap-gutter px-4 py-3 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-gutter px-4 py-3 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="point_of_sale">point_of_sale</span>
+<span class="font-label-caps text-label-caps">POS System</span>
+</a>
+<a class="flex items-center gap-gutter px-4 py-3 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-caps text-label-caps">Inventory</span>
+</a>
+<a class="flex items-center gap-gutter px-4 py-3 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label-caps text-label-caps">Expenses</span>
+</a>
+<a class="flex items-center gap-gutter px-4 py-3 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-caps text-label-caps">Clients</span>
+</a>
+<a class="flex items-center gap-gutter px-4 py-3 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="conveyor_belt">conveyor_belt</span>
+<span class="font-label-caps text-label-caps">Suppliers</span>
+</a>
+<!-- ACTIVE STATE -->
+<a class="flex items-center gap-gutter px-4 py-3 rounded text-primary dark:text-primary border-r-4 border-primary bg-surface-container-highest dark:bg-surface-container-highest cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined icon-fill" data-icon="badge">badge</span>
+<span class="font-label-caps text-label-caps">Employees</span>
+</a>
+<a class="flex items-center gap-gutter px-4 py-3 rounded text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-all cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-caps text-label-caps">Catalog</span>
+</a>
+</nav>
+<div class="px-4 mt-auto flex flex-col gap-2">
+<button class="w-full bg-primary-container text-on-primary-container font-label-caps text-label-caps h-touch-target rounded flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+                Quick Inventory Alert
+            </button>
+<div class="h-[1px] w-full bg-outline-variant my-2"></div>
+<a class="flex items-center gap-gutter px-4 py-3 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+<a class="flex items-center gap-gutter px-4 py-3 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-caps text-label-caps">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 flex flex-col h-[calc(100vh-48px)] md:h-screen overflow-hidden bg-background">
+<!-- Header -->
+<header class="hidden md:flex justify-between items-center px-margin-desktop py-4 bg-surface border-b border-outline-variant z-30 h-[72px]">
+<div class="flex items-center bg-surface-container-low rounded border border-outline-variant px-3 py-2 w-96 focus-within:border-primary focus-within:shadow-[0_0_8px_rgba(255,182,144,0.15)] transition-all">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-full text-on-surface placeholder-on-surface-variant outline-none" placeholder="Search employees, roles, or IDs..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors h-touch-target w-touch-target flex items-center justify-center rounded hover:bg-surface-container-high">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors h-touch-target w-touch-target flex items-center justify-center rounded hover:bg-surface-container-high relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-3 right-3 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="bg-primary text-black font-label-caps text-label-caps h-touch-target px-6 rounded flex items-center gap-2 hover:opacity-90 transition-opacity" onclick="document.getElementById('add-employee-modal').classList.remove('hidden')">
+<span class="material-symbols-outlined">person_add</span>
+                    New Sale
+                </button>
+<img class="w-10 h-10 rounded-full border border-outline-variant object-cover cursor-pointer hover:border-primary transition-colors" data-alt="A small circular avatar of a professional business manager in a dark corporate setting with high contrast lighting, representing the user profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7ADu9habnTU1rV5CGjE_RuAyrlvT0HyMzc8yzT8GPt2YUNOqzh1MTXyNbr0PbMRPau6UC4z8ePacEanbcV4L1SA9h1X-7KotxRbOcP63kWvyHEKomdamTQZxqUzfIykyz1csiHHHNcJfXmakPuX917eWu6PGDlE1VC6Ivb7nUsaUGkH0abamXt2yHgjRkc9E2GaTnCJt7iJeg-g6ETkBK0oUHrgwxCVaJ7YHmM2N0ESoKcF6vRFQn"/>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">Employee Roster</h2>
+<p class="text-on-surface-variant mt-1">Manage staff roles, track performance, and monitor active shifts.</p>
+</div>
+<div class="hidden md:flex gap-2">
+<button class="px-4 h-[36px] flex items-center gap-2 rounded border border-outline-variant text-on-surface hover:border-primary hover:text-primary text-label-caps font-label-caps transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span> Filter
+                    </button>
+<button class="px-4 h-[36px] flex items-center gap-2 rounded border border-outline-variant text-on-surface hover:border-primary hover:text-primary text-label-caps font-label-caps transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span> Export
+                    </button>
+</div>
+</div>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-8">
+<div class="bg-surface rounded-lg p-6 border border-outline-variant flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary transition-colors">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-all"></div>
+<span class="text-on-surface-variant font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">groups</span> Total Staff
+                    </span>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface">42</span>
+<span class="text-primary text-body-sm font-data-mono">+3 this month</span>
+</div>
+</div>
+<div class="bg-surface rounded-lg p-6 border border-outline-variant flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary transition-colors">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-all"></div>
+<span class="text-on-surface-variant font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">point_of_sale</span> Active Registers
+                    </span>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface">8</span>
+<span class="text-on-surface-variant text-body-sm font-data-mono">/ 12 Total</span>
+</div>
+</div>
+<div class="bg-surface rounded-lg p-6 border border-outline-variant flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary transition-colors">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-all"></div>
+<span class="text-on-surface-variant font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> Avg Sales / Employee
+                    </span>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface font-data-mono">$1.2k</span>
+<span class="text-on-surface-variant text-body-sm font-data-mono">Today</span>
+</div>
+</div>
+</div>
+<!-- Employee List (Card based for better touch targets and data density) -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-gutter">
+<!-- Employee Card 1 -->
+<div class="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col sm:flex-row gap-4 hover:bg-surface-container-low hover:border-outline transition-all cursor-pointer">
+<div class="flex items-center gap-4 w-full sm:w-auto sm:border-r border-outline-variant sm:pr-4">
+<img class="w-12 h-12 rounded object-cover" data-alt="A professional headshot of a female manager in a modern corporate setting, moody lighting, sharp focus, 35mm lens, high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1rVxudvvitqfo4ZAxR2t4tovmSmD3kVoJipwLCEQAD8eG_315PniSDc81c4uu3k3xVtrNZPdLZ-z46-45xD1BRenxZqdxUhHpKF2aP0zK93ki9JktuXVE_6wwQvQ7Y8JxCLm30rrxJDrXtNm1_lgn3rB_RTgOoShkQD3w6QjWX-o9b2ti495ayCyiv7Kk0nNHPk0gfi9mOp-LpRT8XXLCK2Y3tGnNi5V0nNdi1VrL9d7E4ZQQf-ai"/>
+<div class="flex-1">
+<h3 class="font-title-md text-title-md text-on-surface">Sarah Jenkins</h3>
+<p class="text-on-surface-variant text-body-sm font-data-mono">ID: EMP-001</p>
+</div>
+</div>
+<div class="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4 items-center">
+<div>
+<span class="block text-[10px] uppercase tracking-wider text-on-surface-variant mb-1">Role</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase bg-primary/10 text-primary border border-primary/20">Admin</span>
+</div>
+<div>
+<span class="block text-[10px] uppercase tracking-wider text-on-surface-variant mb-1">Shift Status</span>
+<div class="flex items-center gap-1 text-on-surface font-data-mono text-body-sm">
+<span class="w-2 h-2 rounded-full bg-[#4ade80]"></span> Active
+                            </div>
+</div>
+<div class="col-span-2 sm:col-span-1 flex justify-end sm:justify-center">
+<div class="text-right">
+<span class="block text-[10px] uppercase tracking-wider text-on-surface-variant mb-1">Sales Today</span>
+<span class="font-data-mono text-on-surface">$3,450</span>
+</div>
+</div>
+</div>
+<div class="hidden sm:flex items-center justify-end pl-2 border-l border-outline-variant">
+<button class="h-10 w-10 flex items-center justify-center rounded hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Employee Card 2 -->
+<div class="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col sm:flex-row gap-4 hover:bg-surface-container-low hover:border-outline transition-all cursor-pointer">
+<div class="flex items-center gap-4 w-full sm:w-auto sm:border-r border-outline-variant sm:pr-4">
+<img class="w-12 h-12 rounded object-cover grayscale" data-alt="A professional headshot of a male retail worker in a modern corporate setting, moody lighting, sharp focus, 35mm lens, high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBQ745LvPQ6GdmLdw01c8L2vmRHm_NQ1IQIR-M-9Kb2-ogDps0pv0jVnw_L7y2Mnr87nVgOWmY0g64yiq1DzHEhU_X9bPvBCufzdskWlPNYGs6ytcjwwAdE3Jz-y-2fWPLt3yhZJSGM-yNXK39c6fBdYBytNymFb2n5h0Fu907ZYC-e85FWTT6IxcBFIrowTOarWH_MNf4vauetZhR0nJP2B4-40W-QiX-MRG_JRybCX14KlKqRxee"/>
+<div class="flex-1">
+<h3 class="font-title-md text-title-md text-on-surface">David Chen</h3>
+<p class="text-on-surface-variant text-body-sm font-data-mono">ID: EMP-045</p>
+</div>
+</div>
+<div class="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4 items-center">
+<div>
+<span class="block text-[10px] uppercase tracking-wider text-on-surface-variant mb-1">Role</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase bg-secondary-container text-on-surface border border-outline-variant">Manager</span>
+</div>
+<div>
+<span class="block text-[10px] uppercase tracking-wider text-on-surface-variant mb-1">Shift Status</span>
+<div class="flex items-center gap-1 text-on-surface-variant font-data-mono text-body-sm">
+<span class="w-2 h-2 rounded-full bg-outline"></span> Off-Shift
+                            </div>
+</div>
+<div class="col-span-2 sm:col-span-1 flex justify-end sm:justify-center">
+<div class="text-right">
+<span class="block text-[10px] uppercase tracking-wider text-on-surface-variant mb-1">Sales Today</span>
+<span class="font-data-mono text-on-surface-variant">$0</span>
+</div>
+</div>
+</div>
+<div class="hidden sm:flex items-center justify-end pl-2 border-l border-outline-variant">
+<button class="h-10 w-10 flex items-center justify-center rounded hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Employee Card 3 -->
+<div class="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col sm:flex-row gap-4 hover:bg-surface-container-low hover:border-outline transition-all cursor-pointer">
+<div class="flex items-center gap-4 w-full sm:w-auto sm:border-r border-outline-variant sm:pr-4">
+<div class="w-12 h-12 rounded bg-surface-container-high flex items-center justify-center text-on-surface-variant font-title-md border border-outline-variant">AJ</div>
+<div class="flex-1">
+<h3 class="font-title-md text-title-md text-on-surface">Alicia Jones</h3>
+<p class="text-on-surface-variant text-body-sm font-data-mono">ID: EMP-082</p>
+</div>
+</div>
+<div class="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4 items-center">
+<div>
+<span class="block text-[10px] uppercase tracking-wider text-on-surface-variant mb-1">Role</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase bg-surface-bright text-on-surface border border-outline-variant">Seller</span>
+</div>
+<div>
+<span class="block text-[10px] uppercase tracking-wider text-on-surface-variant mb-1">Shift Status</span>
+<div class="flex items-center gap-1 text-on-surface font-data-mono text-body-sm">
+<span class="w-2 h-2 rounded-full bg-[#4ade80]"></span> Register 3
+                            </div>
+</div>
+<div class="col-span-2 sm:col-span-1 flex justify-end sm:justify-center">
+<div class="text-right">
+<span class="block text-[10px] uppercase tracking-wider text-on-surface-variant mb-1">Sales Today</span>
+<span class="font-data-mono text-on-surface">$1,120</span>
+</div>
+</div>
+</div>
+<div class="hidden sm:flex items-center justify-end pl-2 border-l border-outline-variant">
+<button class="h-10 w-10 flex items-center justify-center rounded hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal: Add Employee (Hidden by default) -->
+<div class="hidden fixed inset-0 z-[100] flex items-center justify-center px-4" id="add-employee-modal">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-background/80 backdrop-blur-sm" onclick="document.getElementById('add-employee-modal').classList.add('hidden')"></div>
+<!-- Modal Content -->
+<div class="bg-surface border border-outline-variant rounded-lg w-full max-w-md relative z-10 shadow-2xl flex flex-col max-h-[90vh]">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-title-md text-title-md font-bold text-on-surface">Add New Employee</h3>
+<button class="text-on-surface-variant hover:text-primary transition-colors" onclick="document.getElementById('add-employee-modal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-6 overflow-y-auto flex-1 flex flex-col gap-4">
+<div>
+<label class="block text-label-caps font-label-caps text-on-surface-variant mb-2">Full Name</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded px-4 h-12 text-on-surface focus:border-primary focus:ring-0 outline-none transition-colors" placeholder="e.g. John Doe" type="text"/>
+</div>
+<div>
+<label class="block text-label-caps font-label-caps text-on-surface-variant mb-2">Email Address</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded px-4 h-12 text-on-surface focus:border-primary focus:ring-0 outline-none transition-colors" placeholder="john@globalretail.com" type="email"/>
+</div>
+<div>
+<label class="block text-label-caps font-label-caps text-on-surface-variant mb-2">Role &amp; Permissions</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded px-4 h-12 text-on-surface focus:border-primary focus:ring-0 outline-none transition-colors appearance-none cursor-pointer">
+<option value="seller">Seller (Standard POS access)</option>
+<option value="manager">Manager (Overrides &amp; Reporting)</option>
+<option value="admin">Admin (Full System Access)</option>
+</select>
+</div>
+<div>
+<label class="block text-label-caps font-label-caps text-on-surface-variant mb-2">Assigned Register (Optional)</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded px-4 h-12 text-on-surface focus:border-primary focus:ring-0 outline-none transition-colors appearance-none cursor-pointer">
+<option value="">None / Floating</option>
+<option value="r1">Register 1 (Front)</option>
+<option value="r2">Register 2 (Front)</option>
+<option value="r3">Register 3 (Back)</option>
+</select>
+</div>
+</div>
+<div class="p-6 border-t border-outline-variant bg-surface-container-low flex justify-end gap-4 rounded-b-lg">
+<button class="px-6 h-12 rounded border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors font-label-caps text-label-caps" onclick="document.getElementById('add-employee-modal').classList.add('hidden')">
+                    Cancel
+                </button>
+<button class="px-6 h-12 rounded bg-primary text-black font-label-caps text-label-caps hover:opacity-90 transition-opacity">
+                    Create Profile
+                </button>
+</div>
+</div>
+</div>
+</body></html>
