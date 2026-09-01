@@ -20,6 +20,7 @@ export default function Expenses() {
   const [categoryId, setCategoryId] = useState("");
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
+  const [newCategory, setNewCategory] = useState("");
 
   const expenses = useQuery({
     queryKey: ["expenses"],
@@ -47,6 +48,19 @@ export default function Expenses() {
     },
   });
 
+  const addCategoryMutation = useMutation({
+    mutationFn: () =>
+      apiFetch<Category>("/expense-categories", {
+        method: "POST",
+        body: JSON.stringify({ name: newCategory.trim() }),
+      }),
+    onSuccess: (created) => {
+      queryClient.invalidateQueries({ queryKey: ["expense-categories"] });
+      setCategoryId(created.id);
+      setNewCategory("");
+    },
+  });
+
   return (
     <div>
       <div className="flex justify-between items-end mb-6">
@@ -57,6 +71,34 @@ export default function Expenses() {
           <p className="text-on-surface-variant mt-1">Registro de gastos por categoría</p>
         </div>
       </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (newCategory.trim()) addCategoryMutation.mutate();
+        }}
+        className="card p-4 flex items-center gap-3 mb-4"
+      >
+        <span className="material-symbols-outlined text-on-surface-variant">new_label</span>
+        <input
+          className="input-field flex-1"
+          placeholder="Nueva categoría de gasto…"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+        <button
+          type="submit"
+          className="btn-secondary"
+          disabled={!newCategory.trim() || addCategoryMutation.isPending}
+        >
+          {addCategoryMutation.isPending ? "Guardando…" : "+ Nueva"}
+        </button>
+      </form>
+      {addCategoryMutation.error && (
+        <p className="text-error text-body-sm mb-4" role="alert">
+          No se pudo crear la categoría.
+        </p>
+      )}
 
       <form
         onSubmit={(e) => {
