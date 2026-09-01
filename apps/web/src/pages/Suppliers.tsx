@@ -86,19 +86,22 @@ export default function Suppliers() {
 
       <div>
         <h3 className="font-title-md text-title-md text-on-surface mb-3">Compras recientes</h3>
-        <ul className="card divide-y divide-outline-variant">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {purchases.data?.map((p) => (
-            <li key={p.id} className="px-4 py-3 flex justify-between items-center">
-              <div>
-                <span className="text-on-surface">{p.supplier.name}</span>
-                <p className="text-on-surface-variant text-body-sm">
-                  {new Date(p.createdAt).toLocaleDateString("es-AR")}
-                </p>
-              </div>
-              <Money value={p.totalCents} />
-            </li>
+            <div
+              key={p.id}
+              className="card p-4 rounded-xl border border-outline-variant flex flex-col gap-2"
+            >
+              <span className="text-on-surface font-title-md leading-tight">{p.supplier.name}</span>
+              <span className="text-on-surface-variant text-body-sm">
+                {new Date(p.createdAt).toLocaleDateString("es-AR")}
+              </span>
+              <span className="mt-auto pt-2 border-t border-outline-variant">
+                <Money value={p.totalCents} />
+              </span>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );
