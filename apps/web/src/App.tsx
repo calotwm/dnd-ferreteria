@@ -10,7 +10,6 @@ import Clients from "./pages/Clients";
 import Suppliers from "./pages/Suppliers";
 import Employees from "./pages/Employees";
 import Stats from "./pages/Stats";
-import Catalog from "./pages/Catalog";
 import Receipts from "./pages/Receipts";
 import Settings from "./pages/Settings";
 
@@ -48,7 +47,6 @@ export default function App() {
         <Route path="suppliers" element={<Suppliers />} />
         <Route path="employees" element={<Employees />} />
         <Route path="stats" element={<Stats />} />
-        <Route path="catalog" element={<Catalog />} />
         <Route path="receipts" element={<Receipts />} />
         <Route path="settings" element={<Settings />} />
       </Route>

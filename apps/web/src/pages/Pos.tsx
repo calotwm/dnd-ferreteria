@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../api/client";
 import { useCartStore } from "../stores/cartStore";
 import BarcodeScanner from "../components/BarcodeScanner";
-import ProductSearch from "../components/ProductSearch";
+import ProductPicker from "../components/ProductPicker";
 import Cart from "../components/Cart";
 import PaymentPanel from "../components/PaymentPanel";
 import Receipt, { type ReceiptData } from "../components/Receipt";
@@ -83,7 +83,7 @@ export default function Pos() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
         <div className="flex flex-col gap-4">
           <BarcodeScanner onDetected={handleDetected} />
-          <ProductSearch />
+          <ProductPicker />
         </div>
         <div className="card p-6 flex flex-col gap-4">
           <Cart />

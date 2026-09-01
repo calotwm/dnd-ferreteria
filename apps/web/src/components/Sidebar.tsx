@@ -19,7 +19,6 @@ const NAV: NavItem[] = [
   { module: "suppliers", label: "Proveedores", icon: "conveyor_belt", to: "/suppliers" },
   { module: "employees", label: "Empleados", icon: "badge", to: "/employees" },
   { module: "stats", label: "Estadísticas", icon: "monitoring", to: "/stats" },
-  { module: "catalog", label: "Catálogo", icon: "menu_book", to: "/catalog" },
   { module: "receipts", label: "Comprobantes", icon: "receipt_long", to: "/receipts" },
   { module: "settings", label: "Configuración", icon: "settings", to: "/settings" },
 ];
