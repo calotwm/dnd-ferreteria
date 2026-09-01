@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../api/client";
 import InventoryTable from "../components/InventoryTable";
 import ImportPreview from "../components/ImportPreview";
+import ExportButton from "../components/ExportButton";
 
 interface Product {
   id: string;
@@ -29,6 +30,7 @@ export default function Inventory() {
             Stock en tiempo real · <span className="text-error">rojo</span> = menos de 5 unidades
           </p>
         </div>
+        <ExportButton endpoint="/inventory/export" filename="inventario.xlsx" label="Exportar" />
       </div>
 
       <div className="flex flex-col gap-6">

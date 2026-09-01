@@ -3,6 +3,7 @@ import { productInputSchema, productSearchSchema } from "@dnd/shared";
 import { prisma } from "../lib/prisma.js";
 import { authenticate, authorize } from "../middleware/auth.js";
 import { notFound } from "../lib/errors.js";
+import { buildInventoryExportXlsx } from "../services/inventoryExport.js";
 import type { AuthUser } from "../middleware/auth.js";
 
 export interface ProductWithVariants {
@@ -100,6 +101,33 @@ export async function productRoutes(app: FastifyInstance) {
     });
     if (!product) throw notFound("Product not found");
     return serializeProduct(product);
+  });
+
+  // Inventory Excel export (Spanish headers, currency-safe values) — mirrors
+  // /stats/export. Requires inventory read permission.
+  app.get("/inventory/export", read, async (request, reply) => {
+    const user = request.user!;
+    const products = await prisma.product.findMany({
+      where: { businessId: user.businessId },
+      include: includeVariants,
+      orderBy: { name: "asc" },
+    });
+
+    const items = products.map((p) => ({
+      name: p.name,
+      barcode: p.barcode,
+      categoryName: p.category?.name ?? null,
+      costCents: p.costCents,
+      priceCents: p.priceCents,
+      stock: p.variants.reduce((sum, v) => sum + v.stock, 0),
+    }));
+
+    const buf = buildInventoryExportXlsx(items);
+
+    return reply
+      .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      .header("Content-Disposition", 'attachment; filename="inventario.xlsx"')
+      .send(buf);
   });
 
   app.post("/products", create, async (request, reply) => {
