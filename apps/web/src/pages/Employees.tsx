@@ -24,6 +24,14 @@ export default function Employees() {
   const queryClient = useQueryClient();
   const [opening, setOpening] = useState("");
   const [counted, setCounted] = useState("");
+  const [showAdd, setShowAdd] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "SELLER",
+    active: true,
+  });
 
   const current = useQuery({
     queryKey: ["cash-session", "current"],
@@ -60,13 +68,28 @@ export default function Employees() {
 
   const session = current.data?.session;
 
+  const createUser = useMutation({
+    mutationFn: (body: { name: string; email: string; password: string; role: string; active: boolean }) =>
+      apiFetch("/users", { method: "POST", body: JSON.stringify(body) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setShowAdd(false);
+      setForm({ name: "", email: "", password: "", role: "SELLER", active: true });
+    },
+  });
+
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">
-          Empleados
-        </h2>
-        <p className="text-on-surface-variant mt-1">Usuarios, caja y desempeño</p>
+      <div className="flex justify-between items-end">
+        <div>
+          <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">
+            Empleados
+          </h2>
+          <p className="text-on-surface-variant mt-1">Usuarios, caja y desempeño</p>
+        </div>
+        <button type="button" className="btn-primary" onClick={() => setShowAdd(true)}>
+          Agregar empleado
+        </button>
       </div>
 
       <div className="card p-6 flex flex-col gap-3">
@@ -155,6 +178,86 @@ export default function Employees() {
           </tbody>
         </table>
       </div>
+
+      {showAdd && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowAdd(false)} />
+          <div className="card relative z-10 w-full max-w-md p-6 flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <h3 className="font-title-md text-title-md text-on-surface">Agregar empleado</h3>
+              <button
+                type="button"
+                onClick={() => setShowAdd(false)}
+                className="text-on-surface-variant hover:text-primary text-xl leading-none"
+                aria-label="Cerrar"
+              >
+                ×
+              </button>
+            </div>
+            <form
+              className="flex flex-col gap-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (form.name && form.email && form.password.length >= 6) createUser.mutate(form);
+              }}
+            >
+              <div>
+                <label className="text-label-caps font-label-caps text-on-surface-variant mb-1 block">
+                  Nombre
+                </label>
+                <input
+                  className="input-field"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-label-caps font-label-caps text-on-surface-variant mb-1 block">
+                  Email
+                </label>
+                <input
+                  className="input-field"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-label-caps font-label-caps text-on-surface-variant mb-1 block">
+                  Contraseña
+                </label>
+                <input
+                  className="input-field"
+                  type="password"
+                  minLength={6}
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-label-caps font-label-caps text-on-surface-variant mb-1 block">
+                  Rol
+                </label>
+                <select
+                  className="input-field"
+                  value={form.role}
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                >
+                  <option value="SELLER">Vendedor</option>
+                  <option value="MANAGER">Gerente</option>
+                  <option value="ADMIN">Administrador</option>
+                </select>
+              </div>
+              <button type="submit" className="btn-primary" disabled={createUser.isPending}>
+                {createUser.isPending ? "Creando..." : "Crear empleado"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
