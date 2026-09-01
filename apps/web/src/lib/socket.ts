@@ -5,10 +5,23 @@ let socket: Socket | null = null;
 
 export function getSocket(): Socket {
   if (!socket) {
-    socket = io("/", {
+    const s = io("/", {
       autoConnect: true,
-      auth: { token: getAccessToken() },
+      // Callback form reads the freshest token on every (re)connect handshake.
+      // A static `auth: { token }` closure would go stale after the 15m JWT expiry.
+      auth: (cb) => cb({ token: getAccessToken() }),
     });
+
+    // Unauthorized (expired/rotated token): drop the socket and reconnect so the
+    // next handshake re-reads the token via the callback above.
+    s.on("connect_error", (err) => {
+      if (err.message === "unauthorized") {
+        s.disconnect();
+        s.connect();
+      }
+    });
+
+    socket = s;
   }
   return socket;
 }

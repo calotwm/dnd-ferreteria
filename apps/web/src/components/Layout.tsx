@@ -1,7 +1,13 @@
 import { Outlet } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import Sidebar from "./Sidebar";
+import { useRealtimeSync } from "../lib/realtime";
+import { getSocket } from "../lib/socket";
 
 export default function Layout() {
+  const queryClient = useQueryClient();
+  useRealtimeSync(queryClient, getSocket());
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background">
       {/* Top nav (mobile) */}
