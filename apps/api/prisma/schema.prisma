@@ -1,0 +1,431 @@
+// Prisma schema — DND Ferretería
+// Money is integer cents stored as BigInt (serialized to JSON as strings).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  SELLER
+}
+
+enum PaymentMethod {
+  EFECTIVO
+  TARJETA
+  TRANSFERENCIA
+  FIADO
+}
+
+enum MovementType {
+  SALE
+  PURCHASE
+  ADJUSTMENT
+  RETURN
+}
+
+enum CashMovementType {
+  OPEN
+  SALE_IN
+  CASH_IN
+  CASH_OUT
+  EXPENSE_OUT
+  CLOSE
+}
+
+model Business {
+  id         String   @id @default(cuid())
+  name       String
+  currency   String   @default("ARS")
+  ivaRate    Decimal? @default(0)
+  createdAt  DateTime @default(now())
+
+  branches           Branch[]
+  products           Product[]
+  categories         Category[]
+  customers          Customer[]
+  suppliers          Supplier[]
+  expenses           Expense[]
+  expenseCategories  ExpenseCategory[]
+  users              User[]
+  inventoryMovements InventoryMovement[]
+  sales              Sale[]
+  debts              Debt[]
+  purchases          Purchase[]
+  onboarding         OnboardingChecklist[]
+}
+
+model Branch {
+  id         String @id @default(cuid())
+  businessId String
+  name       String
+  createdAt  DateTime @default(now())
+
+  business           Business            @relation(fields: [businessId], references: [id])
+  users              User[]
+  inventoryMovements InventoryMovement[]
+  sales              Sale[]
+  expenses           Expense[]
+  cashSessions       CashSession[]
+  cashMovements      CashMovement[]
+
+  @@index([businessId])
+}
+
+model User {
+  id           String   @id @default(cuid())
+  businessId   String
+  branchId     String?
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(SELLER)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  business           Business            @relation(fields: [businessId], references: [id])
+  branch             Branch?             @relation(fields: [branchId], references: [id])
+  sales              Sale[]
+  inventoryMovements InventoryMovement[]
+  cashSessions       CashSession[]
+  cashMovements      CashMovement[]
+  abonos             Abono[]
+
+  @@index([businessId])
+  @@index([branchId])
+}
+
+model Permission {
+  id     String @id @default(cuid())
+  role   Role
+  module String
+  action String
+
+  @@unique([role, module, action])
+}
+
+model Category {
+  id         String @id @default(cuid())
+  businessId String
+  name       String
+  createdAt  DateTime @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id])
+  products Product[]
+
+  @@index([businessId])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  businessId  String
+  categoryId  String?
+  name        String
+  barcode     String?
+  description String?
+  costCents   BigInt   @default(0)
+  priceCents  BigInt   @default(0)
+  active      Boolean  @default(true)
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business     Business       @relation(fields: [businessId], references: [id])
+  category     Category?      @relation(fields: [categoryId], references: [id])
+  variants     Variant[]
+  saleItems    SaleItem[]
+  purchaseItems PurchaseItem[]
+  inventoryMovements InventoryMovement[]
+  images       ProductImage[]
+
+  @@index([businessId])
+  @@index([categoryId])
+}
+
+model Variant {
+  id         String  @id @default(cuid())
+  productId  String
+  sku        String?
+  barcode    String?
+  priceCents BigInt  @default(0)
+  costCents  BigInt  @default(0)
+  stock      Int     @default(0)
+  active     Boolean @default(true)
+  createdAt  DateTime @default(now())
+
+  product           Product            @relation(fields: [productId], references: [id])
+  saleItems         SaleItem[]
+  purchaseItems     PurchaseItem[]
+  inventoryMovements InventoryMovement[]
+
+  @@index([productId])
+}
+
+model InventoryMovement {
+  id         String       @id @default(cuid())
+  businessId String
+  branchId   String
+  productId  String
+  variantId  String?
+  type       MovementType
+  qty        Int
+  userId     String
+  reason     String?
+  createdAt  DateTime     @default(now())
+
+  business Business @relation(fields: [businessId], references: [id])
+  branch   Branch   @relation(fields: [branchId], references: [id])
+  product  Product  @relation(fields: [productId], references: [id])
+  variant  Variant? @relation(fields: [variantId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@index([businessId, branchId, variantId])
+  @@index([createdAt])
+}
+
+model Sale {
+  id            String   @id @default(cuid())
+  businessId    String
+  branchId      String
+  sellerId      String
+  customerId    String?
+  totalCents    BigInt   @default(0)
+  discountCents BigInt   @default(0)
+  createdAt     DateTime @default(now())
+
+  business  Business   @relation(fields: [businessId], references: [id])
+  branch    Branch     @relation(fields: [branchId], references: [id])
+  seller    User       @relation(fields: [sellerId], references: [id])
+  customer  Customer?  @relation(fields: [customerId], references: [id])
+  items     SaleItem[]
+  payments  Payment[]
+  debts     Debt[]
+  receipts  Receipt[]
+
+  @@index([businessId, branchId, createdAt])
+  @@index([sellerId])
+}
+
+model SaleItem {
+  id             String @id @default(cuid())
+  saleId         String
+  productId      String
+  variantId      String
+  qty            Int
+  unitPriceCents BigInt @default(0)
+
+  sale    Sale    @relation(fields: [saleId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  variant Variant @relation(fields: [variantId], references: [id])
+
+  @@index([saleId])
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  saleId      String
+  method      PaymentMethod
+  amountCents BigInt        @default(0)
+
+  sale Sale @relation(fields: [saleId], references: [id])
+
+  @@index([saleId])
+}
+
+model Customer {
+  id         String  @id @default(cuid())
+  businessId String
+  name       String
+  phone      String?
+  email      String?
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id])
+  sales    Sale[]
+  debts    Debt[]
+
+  @@index([businessId])
+}
+
+model Debt {
+  id             String   @id @default(cuid())
+  businessId     String
+  customerId     String
+  saleId         String?
+  totalCents     BigInt   @default(0)
+  remainingCents BigInt   @default(0)
+  dueAt          DateTime?
+  createdAt      DateTime @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id])
+  customer Customer  @relation(fields: [customerId], references: [id])
+  sale     Sale?     @relation(fields: [saleId], references: [id])
+  abonos   Abono[]
+
+  @@index([businessId, customerId])
+  @@index([remainingCents])
+}
+
+model Abono {
+  id          String   @id @default(cuid())
+  debtId      String
+  amountCents BigInt   @default(0)
+  userId      String
+  createdAt   DateTime @default(now())
+
+  debt Debt @relation(fields: [debtId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([debtId])
+}
+
+model Supplier {
+  id         String @id @default(cuid())
+  businessId String
+  name       String
+  phone      String?
+  email      String?
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  business  Business   @relation(fields: [businessId], references: [id])
+  purchases Purchase[]
+
+  @@index([businessId])
+}
+
+model Purchase {
+  id         String   @id @default(cuid())
+  businessId String
+  supplierId String
+  totalCents BigInt   @default(0)
+  note       String?
+  createdAt  DateTime @default(now())
+
+  business Business        @relation(fields: [businessId], references: [id])
+  supplier Supplier        @relation(fields: [supplierId], references: [id])
+  items    PurchaseItem[]
+
+  @@index([businessId, supplierId, createdAt])
+}
+
+model PurchaseItem {
+  id         String @id @default(cuid())
+  purchaseId String
+  productId  String
+  variantId  String
+  qty        Int
+  costCents  BigInt @default(0)
+
+  purchase Purchase @relation(fields: [purchaseId], references: [id])
+  product  Product  @relation(fields: [productId], references: [id])
+  variant  Variant  @relation(fields: [variantId], references: [id])
+
+  @@index([purchaseId])
+}
+
+model ExpenseCategory {
+  id         String @id @default(cuid())
+  businessId String
+  name       String
+  createdAt  DateTime @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id])
+  expenses Expense[]
+
+  @@index([businessId])
+}
+
+model Expense {
+  id         String   @id @default(cuid())
+  businessId String
+  branchId   String
+  categoryId String
+  amountCents BigInt  @default(0)
+  note       String?
+  spentAt    DateTime @default(now())
+
+  business Business        @relation(fields: [businessId], references: [id])
+  branch   Branch          @relation(fields: [branchId], references: [id])
+  category ExpenseCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([businessId, branchId, spentAt])
+}
+
+model CashSession {
+  id             String    @id @default(cuid())
+  branchId       String
+  userId         String
+  openingCents   BigInt    @default(0)
+  expectedCents  BigInt    @default(0)
+  countedCents   BigInt?
+  differenceCents BigInt?
+  openedAt       DateTime  @default(now())
+  closedAt       DateTime?
+
+  branch   Branch          @relation(fields: [branchId], references: [id])
+  user     User            @relation(fields: [userId], references: [id])
+  movements CashMovement[]
+
+  @@index([branchId, openedAt])
+}
+
+model CashMovement {
+  id          String           @id @default(cuid())
+  sessionId   String
+  branchId    String
+  userId      String
+  type        CashMovementType
+  amountCents BigInt           @default(0)
+  createdAt   DateTime         @default(now())
+
+  session CashSession @relation(fields: [sessionId], references: [id])
+  branch  Branch      @relation(fields: [branchId], references: [id])
+  user    User        @relation(fields: [userId], references: [id])
+
+  @@index([sessionId])
+}
+
+model ProductImage {
+  id        String @id @default(cuid())
+  productId String
+  storage   String @default("r2") // "r2" | "blob"
+  url       String?
+  data      Bytes?
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+}
+
+model Receipt {
+  id         String   @id @default(cuid())
+  saleId     String
+  number     String   @unique
+  totalCents BigInt   @default(0)
+  createdAt  DateTime @default(now())
+
+  sale Sale @relation(fields: [saleId], references: [id])
+
+  @@index([saleId])
+}
+
+model OnboardingChecklist {
+  id         String   @id @default(cuid())
+  businessId String
+  step       String
+  done       Boolean  @default(false)
+  updatedAt  DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@unique([businessId, step])
+}
