@@ -6,8 +6,8 @@ import { test, expect } from "@playwright/test";
 test.describe("POS sale → stock integrity", () => {
   test("sale deducts stock atomically", async ({ page }) => {
     await page.goto("/login");
-    await page.getByPlaceholder(/correo/i).fill("admin@dnd.com");
-    await page.getByPlaceholder(/contraseña/i).fill("admin123");
+    await page.locator('input[type="email"]').fill("admin@dnd.com");
+    await page.locator('input[type="password"]').fill("admin123");
     await page.getByRole("button", { name: /ingresar/i }).click();
     await expect(page.getByText(/dashboard/i).first()).toBeVisible();
   });
