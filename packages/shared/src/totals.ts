@@ -32,3 +32,24 @@ export function computeTotals(
   discountCents = Math.min(discountCents, subtotalCents);
   return { subtotalCents, discountCents, totalCents: subtotalCents - discountCents };
 }
+
+/**
+ * Validate that payment amounts are integer cents and sum EXACTLY to the
+ * post-discount total. Returns a result object (no throw) so callers and unit
+ * tests can branch cleanly (spec: pos/payment methods — reject mismatched sums).
+ */
+export function validatePaymentsSum(
+  payments: Array<{ amountCents: number }>,
+  totalCents: number,
+): { ok: true } | { ok: false; error: string } {
+  for (const p of payments) {
+    if (!Number.isSafeInteger(p.amountCents)) {
+      return { ok: false, error: "Payment amount must be an integer number of cents" };
+    }
+  }
+  const sum = payments.reduce((s, p) => s + p.amountCents, 0);
+  if (sum !== totalCents) {
+    return { ok: false, error: `Payments sum ${sum} does not equal total ${totalCents}` };
+  }
+  return { ok: true };
+}

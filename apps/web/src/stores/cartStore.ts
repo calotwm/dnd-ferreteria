@@ -11,10 +11,15 @@ export interface CartLine {
 
 export type PaymentMethod = "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO";
 
+export interface Payment {
+  method: PaymentMethod;
+  amountCents: number;
+}
+
 interface CartState {
   items: CartLine[];
   customerId: string | null;
-  paymentMethod: PaymentMethod;
+  payments: Payment[];
   discountType: "percent" | "fixed" | null;
   discountValue: number;
   addItem: (line: Omit<CartLine, "qty">) => void;
@@ -23,14 +28,16 @@ interface CartState {
   removeItem: (variantId: string) => void;
   clear: () => void;
   setCustomer: (id: string | null) => void;
-  setPaymentMethod: (m: PaymentMethod) => void;
+  addPayment: (method: PaymentMethod, amountCents: number) => void;
+  removePayment: (index: number) => void;
+  updatePayment: (index: number, field: "method" | "amountCents", value: PaymentMethod | number) => void;
   setDiscount: (type: "percent" | "fixed" | null, value: number) => void;
 }
 
 export const useCartStore = create<CartState>((set) => ({
   items: [],
   customerId: null,
-  paymentMethod: "EFECTIVO",
+  payments: [],
   discountType: null,
   discountValue: 0,
 
@@ -65,10 +72,22 @@ export const useCartStore = create<CartState>((set) => ({
   removeItem: (variantId) =>
     set((state) => ({ items: state.items.filter((i) => i.variantId !== variantId) })),
 
-  clear: () => set({ items: [], customerId: null, discountType: null, discountValue: 0 }),
+  clear: () =>
+    set({ items: [], customerId: null, payments: [], discountType: null, discountValue: 0 }),
 
   setCustomer: (id) => set({ customerId: id }),
-  setPaymentMethod: (m) => set({ paymentMethod: m }),
+
+  addPayment: (method, amountCents) =>
+    set((state) => ({ payments: [...state.payments, { method, amountCents }] })),
+
+  removePayment: (index) =>
+    set((state) => ({ payments: state.payments.filter((_, i) => i !== index) })),
+
+  updatePayment: (index, field, value) =>
+    set((state) => ({
+      payments: state.payments.map((p, i) => (i === index ? { ...p, [field]: value } : p)),
+    })),
+
   setDiscount: (type, value) => set({ discountType: type, discountValue: value }),
 }));
 
@@ -83,4 +102,12 @@ export function useCartTotals(): { subtotalCents: number; discountCents: number;
     items.map((i) => ({ variantId: i.variantId, qty: i.qty, unitPriceCents: i.unitPriceCents })),
     discount,
   );
+}
+
+/** Remaining cents to cover: cart total minus the sum of the payment rows. */
+export function useRemainingCents(): number {
+  const payments = useCartStore((s) => s.payments);
+  const { totalCents } = useCartTotals();
+  const paid = payments.reduce((sum, p) => sum + p.amountCents, 0);
+  return totalCents - paid;
 }

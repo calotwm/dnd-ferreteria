@@ -1,12 +1,28 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { emit } from "../lib/socket.js";
-import { computeTotals, crossedBelowThreshold, type SaleDiscount, type SaleItemInput } from "@dnd/shared";
+import {
+  computeTotals,
+  crossedBelowThreshold,
+  validatePaymentsSum,
+  type SaleDiscount,
+  type SaleItemInput,
+} from "@dnd/shared";
+
+export type PaymentMethod = "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO";
+
+export interface PaymentInput {
+  method: PaymentMethod;
+  amountCents: number;
+}
 
 export interface CreateSaleInput {
   items: SaleItemInput[];
-  paymentMethod: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "FIADO";
-  amountCents: number;
+  /** Canonical: multiple payments whose sum must equal the post-discount total. */
+  payments?: PaymentInput[];
+  /** Legacy single-payment fields (kept for backward compatibility). */
+  paymentMethod?: PaymentMethod;
+  amountCents?: number;
   discount: SaleDiscount | null;
   customerId: string | null;
 }
@@ -19,15 +35,39 @@ export interface SaleContext {
 
 export { computeTotals };
 
+/** Resolve canonical `payments[]` from the new array or the legacy single-payment fields. */
+function resolvePayments(input: CreateSaleInput, totalCents: number): PaymentInput[] {
+  if (input.payments && input.payments.length > 0) {
+    return input.payments;
+  }
+  if (input.paymentMethod === undefined) {
+    throw new Error("Payments required");
+  }
+  // Legacy fallback: a single payment. For FIADO the old code forced the full
+  // total; keep that exact behavior so existing callers stay green.
+  const amountCents = input.paymentMethod === "FIADO" ? totalCents : (input.amountCents ?? totalCents);
+  return [{ method: input.paymentMethod, amountCents }];
+}
+
 /**
  * Create a sale and deduct stock atomically. Row locks (`SELECT ... FOR UPDATE`)
  * guarantee no oversell under concurrency. A sale is rejected when any variant
- * lacks sufficient stock, leaving stock unchanged (spec: pos/integrity).
+ * lacks sufficient stock or when payments do not sum to the total, leaving
+ * stock unchanged (spec: pos/integrity).
  */
 export async function createSale(input: CreateSaleInput, ctx: SaleContext) {
   const { subtotalCents, discountCents, totalCents } = computeTotals(input.items, input.discount);
 
   return prisma.$transaction(async (tx) => {
+    const payments = resolvePayments(input, totalCents);
+
+    // Authoritative check: payments must sum EXACTLY to the post-discount total
+    // (integer cents). Reject otherwise (spec: pos/payment methods).
+    const validation = validatePaymentsSum(payments, totalCents);
+    if (!validation.ok) {
+      throw new Error(validation.error);
+    }
+
     // 1. Lock variant rows in a deterministic order to avoid deadlocks.
     const variantIds = [...new Set(input.items.map((i) => i.variantId))].sort();
     const locked = await tx.$queryRaw<Array<{ id: string; stock: number }>>(
@@ -107,18 +147,22 @@ export async function createSale(input: CreateSaleInput, ctx: SaleContext) {
       }
     }
 
-    // 5. Payment.
-    const payment = await tx.payment.create({
-      data: {
-        saleId: sale.id,
-        method: input.paymentMethod,
-        amountCents: input.paymentMethod === "FIADO" ? totalCents : input.amountCents,
-      },
-    });
+    // 5. Payments — one row per method/amount (split payment support).
+    const createdPayments = await Promise.all(
+      payments.map((p) =>
+        tx.payment.create({
+          data: { saleId: sale.id, method: p.method, amountCents: p.amountCents },
+        }),
+      ),
+    );
 
-    // 6. Fiado → debt (spec: pos/payment).
+    // 6. Fiado → debt for the FIADO portion only (not the whole total).
+    const fiadoPortion = payments
+      .filter((p) => p.method === "FIADO")
+      .reduce((sum, p) => sum + p.amountCents, 0);
+
     let debtId: string | null = null;
-    if (input.paymentMethod === "FIADO") {
+    if (fiadoPortion > 0) {
       if (!input.customerId) {
         throw new Error("Fiado requires a customer");
       }
@@ -127,8 +171,8 @@ export async function createSale(input: CreateSaleInput, ctx: SaleContext) {
           businessId: ctx.businessId,
           customerId: input.customerId,
           saleId: sale.id,
-          totalCents,
-          remainingCents: totalCents,
+          totalCents: fiadoPortion,
+          remainingCents: fiadoPortion,
           dueAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         },
       });
@@ -141,8 +185,12 @@ export async function createSale(input: CreateSaleInput, ctx: SaleContext) {
       data: { saleId: sale.id, number, totalCents },
     });
 
-    // 8. Cash movement if an open cash session exists and payment is cash.
-    if (input.paymentMethod === "EFECTIVO") {
+    // 8. Cash movement for the EFECTIVO portion (not the total).
+    const efectivoPortion = payments
+      .filter((p) => p.method === "EFECTIVO")
+      .reduce((sum, p) => sum + p.amountCents, 0);
+
+    if (efectivoPortion > 0) {
       const session = await tx.cashSession.findFirst({
         where: { branchId: ctx.branchId, closedAt: null },
         orderBy: { openedAt: "desc" },
@@ -154,7 +202,7 @@ export async function createSale(input: CreateSaleInput, ctx: SaleContext) {
             branchId: ctx.branchId,
             userId: ctx.sellerId,
             type: "SALE_IN",
-            amountCents: totalCents,
+            amountCents: efectivoPortion,
           },
         });
       }
@@ -166,6 +214,6 @@ export async function createSale(input: CreateSaleInput, ctx: SaleContext) {
       emit("fiado.paid", { debtId }, ctx.branchId, ctx.businessId);
     }
 
-    return { sale, payment, receipt, debtId, subtotalCents, discountCents, totalCents };
+    return { sale, payments: createdPayments, receipt, debtId, subtotalCents, discountCents, totalCents };
   });
 }

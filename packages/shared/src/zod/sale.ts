@@ -3,6 +3,12 @@ import { moneySchema, positiveMoneySchema } from "../money";
 
 export const paymentMethodSchema = z.enum(["EFECTIVO", "TARJETA", "TRANSFERENCIA", "FIADO"]);
 
+/** A single payment method + amount (canonical split-payment unit). */
+export const paymentInputSchema = z.object({
+  method: paymentMethodSchema,
+  amountCents: moneySchema,
+});
+
 export const cartItemSchema = z.object({
   variantId: z.string().min(1),
   productName: z.string().optional(),
@@ -21,11 +27,13 @@ export const discountSchema = z
 export const createSaleSchema = z.object({
   customerId: z.string().optional().nullable(),
   items: z.array(cartItemSchema).min(1),
+  payments: z.array(paymentInputSchema).min(1).optional(),
+  // Legacy single-payment shape (kept optional for backward compatibility).
   payment: z.object({
     method: paymentMethodSchema,
     amountCents: moneySchema,
     discountCents: moneySchema.default(0),
-  }),
+  }).optional(),
   discount: discountSchema,
 });
 

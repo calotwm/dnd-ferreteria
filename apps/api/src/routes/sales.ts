@@ -14,6 +14,12 @@ export async function saleRoutes(app: FastifyInstance) {
     const user = request.user!;
     const input = createSaleSchema.parse(request.body);
 
+    // Prefer the canonical `payments[]`; fall back to the legacy single-payment
+    // shape when present (backward compatibility).
+    const payments = input.payments ?? (input.payment
+      ? [{ method: input.payment.method, amountCents: input.payment.amountCents }]
+      : undefined);
+
     try {
       const result = await createSale(
         {
@@ -22,8 +28,7 @@ export async function saleRoutes(app: FastifyInstance) {
             qty: i.qty,
             unitPriceCents: i.unitPriceCents,
           })),
-          paymentMethod: input.payment.method,
-          amountCents: input.payment.amountCents,
+          payments,
           discount: input.discount ?? null,
           customerId: input.customerId ?? null,
         },
