@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="32" fill="#121414"/>
+  <rect width="192" height="192" rx="32" fill="none" stroke="#584237" stroke-width="4"/>
+  <circle cx="96" cy="96" r="56" fill="#f97316"/>
+  <text x="96" y="118" font-family="Arial, sans-serif" font-size="44" font-weight="700" text-anchor="middle" fill="#121414">DND</text>
+</svg>

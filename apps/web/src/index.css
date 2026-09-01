@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-on-background font-sans text-body-sm antialiased;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  }
+  .icon-fill {
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #121414;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #333535;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #474746;
+  }
+}
+
+@layer components {
+  .input-field {
+    @apply w-full bg-surface-container-lowest border border-outline-variant rounded px-4 h-12 text-on-surface placeholder-on-surface-variant focus:border-primary focus:ring-0 outline-none transition-colors;
+  }
+  .btn-primary {
+    @apply bg-primary text-on-primary font-label-caps text-label-caps h-touch-target px-6 rounded inline-flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply border border-outline-variant text-on-surface hover:bg-surface-container-high h-12 px-6 rounded inline-flex items-center justify-center gap-2 font-label-caps text-label-caps transition-colors;
+  }
+  .card {
+    @apply bg-surface border border-outline-variant rounded-lg;
+  }
+}
