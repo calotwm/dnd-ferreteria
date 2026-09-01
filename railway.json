@@ -5,7 +5,7 @@
       "buildCommand": "pnpm install --frozen-lockfile && pnpm build"
   },
   "deploy": {
-    "startCommand": "pnpm db:push && pnpm db:seed && TEST_DATABASE_URL=$DATABASE_URL pnpm --filter @dnd/api test",
+    "startCommand": "pnpm db:push && pnpm db:seed && pnpm start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 120,
     "restartPolicyType": "ON_FAILURE",
