@@ -1,9 +1,29 @@
 import type { PrismaClient } from "@prisma/client";
+import { crossedBelowThreshold } from "@dnd/shared";
+import { emit } from "../lib/socket.js";
 
 export interface MovementCtx {
   businessId: string;
   branchId: string;
   userId: string;
+}
+
+/**
+ * Emit a `low_stock` event only when a mutation crosses below the threshold.
+ * Purchase/import only increment stock, so this never fires there — it is kept
+ * uniform with the sale path as defense-in-depth (spec: platform/low-stock).
+ */
+export function emitLowStockIfCrossed(
+  before: number,
+  after: number,
+  productId: string,
+  name: string,
+  branchId?: string,
+  businessId?: string,
+): void {
+  if (crossedBelowThreshold(before, after)) {
+    emit("low_stock", { productId, name, stock: after }, branchId, businessId);
+  }
 }
 
 /**

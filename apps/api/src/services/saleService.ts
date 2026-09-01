@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { emit } from "../lib/socket.js";
-import { computeTotals, type SaleDiscount, type SaleItemInput } from "@dnd/shared";
+import { computeTotals, crossedBelowThreshold, type SaleDiscount, type SaleItemInput } from "@dnd/shared";
 
 export interface CreateSaleInput {
   items: SaleItemInput[];
@@ -60,6 +60,9 @@ export async function createSale(input: CreateSaleInput, ctx: SaleContext) {
 
     // 4. Sale items + stock decrement + inventory movement (atomic, same tx).
     for (const item of input.items) {
+      const before = stockById.get(item.variantId)!;
+      const after = before - item.qty;
+
       const variant = await tx.variant.update({
         where: { id: item.variantId },
         data: { stock: { decrement: item.qty } },
@@ -87,6 +90,21 @@ export async function createSale(input: CreateSaleInput, ctx: SaleContext) {
           reason: `Venta ${sale.id}`,
         },
       });
+
+      // Low-stock alert: emit only on the downward crossing (< threshold), never
+      // per-unit while already below (spec: platform/low-stock emission).
+      if (crossedBelowThreshold(before, after)) {
+        const product = await tx.product.findUnique({
+          where: { id: variant.productId },
+          select: { name: true },
+        });
+        emit(
+          "low_stock",
+          { productId: variant.productId, name: product?.name ?? "", stock: after },
+          ctx.branchId,
+          ctx.businessId,
+        );
+      }
     }
 
     // 5. Payment.

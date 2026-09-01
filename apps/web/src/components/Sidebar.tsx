@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { readableModules, type Module, type Role } from "@dnd/shared";
 import { useAuth } from "../api/auth";
+import LowStockBell from "./LowStockBell";
 
 interface NavItem {
   module: Module;
@@ -39,10 +40,11 @@ export default function Sidebar() {
         <div className="w-10 h-10 rounded bg-primary-container flex items-center justify-center">
           <span className="material-symbols-outlined text-on-primary-container">hardware</span>
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="font-headline-lg text-title-md text-primary font-bold">DND Ferretería</h1>
           <p className="font-label-caps text-label-caps text-on-surface-variant">{user?.name}</p>
         </div>
+        <LowStockBell />
       </div>
 
       <nav className="flex-1 overflow-y-auto w-full px-4 flex flex-col gap-unit">

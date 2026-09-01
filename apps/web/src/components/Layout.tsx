@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import Sidebar from "./Sidebar";
+import LowStockBell from "./LowStockBell";
 import { useRealtimeSync } from "../lib/realtime";
 import { getSocket } from "../lib/socket";
 
@@ -18,7 +19,10 @@ export default function Layout() {
             DND Ferretería
           </span>
         </div>
-        <span className="material-symbols-outlined text-on-surface-variant">account_circle</span>
+        <div className="flex items-center gap-1">
+          <LowStockBell />
+          <span className="material-symbols-outlined text-on-surface-variant">account_circle</span>
+        </div>
       </nav>
 
       <Sidebar />

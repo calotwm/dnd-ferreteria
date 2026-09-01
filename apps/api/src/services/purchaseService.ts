@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 import { emit } from "../lib/socket.js";
+import { emitLowStockIfCrossed } from "./inventory.js";
 
 export interface PurchaseItemInput {
   variantId: string;
@@ -41,6 +42,7 @@ export async function createPurchase(
       const variant = await tx.variant.update({
         where: { id: item.variantId },
         data: { stock: { increment: item.qty } },
+        include: { product: { select: { name: true } } },
       });
 
       await tx.purchaseItem.create({
@@ -65,6 +67,17 @@ export async function createPurchase(
           reason: `Compra ${purchase.id}`,
         },
       });
+
+      // Defense-in-depth: purchases only increment stock, so they never cross
+      // below the threshold — kept uniform with sales/imports (design).
+      emitLowStockIfCrossed(
+        variant.stock - item.qty,
+        variant.stock,
+        variant.productId,
+        variant.product.name,
+        ctx.branchId,
+        ctx.businessId,
+      );
     }
 
     await tx.purchase.update({ where: { id: purchase.id }, data: { totalCents } });

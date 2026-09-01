@@ -4,7 +4,7 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { authenticate, authorize } from "../middleware/auth.js";
 import { normalizeImportRows } from "../services/importService.js";
-import { recordInventoryMovement } from "../services/inventory.js";
+import { recordInventoryMovement, emitLowStockIfCrossed } from "../services/inventory.js";
 import type { AuthUser } from "../middleware/auth.js";
 
 const commitSchema = z.object({
@@ -54,10 +54,20 @@ async function commitRows(user: AuthUser, rawRows: Array<Record<string, unknown>
         orderBy: { createdAt: "asc" },
       });
       if (defaultVariant) {
-        await prisma.variant.update({
+        const updated = await prisma.variant.update({
           where: { id: defaultVariant.id },
           data: { stock: { increment: stock }, barcode: barcode ?? defaultVariant.barcode },
         });
+        // Defense-in-depth: imports only increment stock, so they never cross
+        // below the threshold — kept uniform with sales/purchases (design).
+        emitLowStockIfCrossed(
+          updated.stock - stock,
+          updated.stock,
+          product.id,
+          product.name,
+          user.branchId ?? undefined,
+          user.businessId,
+        );
         if (stock > 0) {
           await recordInventoryMovement(prisma, {
             businessId: user.businessId,
@@ -87,6 +97,14 @@ async function commitRows(user: AuthUser, rawRows: Array<Record<string, unknown>
         },
         include: { variants: true },
       });
+      emitLowStockIfCrossed(
+        0,
+        stock,
+        created.id,
+        created.name,
+        user.branchId ?? undefined,
+        user.businessId,
+      );
       if (stock > 0) {
         await recordInventoryMovement(prisma, {
           businessId: user.businessId,
